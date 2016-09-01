@@ -17,7 +17,7 @@ class BlurSuite extends FunSuite {
 
     for (x <- 0 until 5; y <- 0 until 5)
       assert(boxBlurKernel(src, x, y, 0) === rgba(x, y, x + y, math.abs(x - y)),
-        "boxBlurKernel(_,_,0) should be identity.")
+        s"boxBlurKernel($x,$y,0) should be identity.")
   }
 
   test("boxBlurKernel should return the correct value on an interior pixel " +
@@ -31,6 +31,55 @@ class BlurSuite extends FunSuite {
     assert(boxBlurKernel(src, 1, 2, 1) === 12,
       s"(boxBlurKernel(1, 2, 1) should be 12, " +
         s"but it's ${boxBlurKernel(src, 1, 2, 1)})")
+  }
+
+  test("boxBlurKernel should return the correct value on an pixel and radius outside the image" +
+    "of a 0x0 image with radius 1") {
+    val src = new Img(1, 1)
+    src(0, 0) = 0; 
+
+    assert(boxBlurKernel(src, 0, 0, 1) === 0,
+      s"(boxBlurKernel(0, 0, 1) should be 0, " +
+        s"but it's ${boxBlurKernel(src, 0, 0, 1)})")
+  }
+
+  test("boxBlurKernel should return the correct value on an interior pixel with outside values of the image" +
+    "of a 3x4 image with radius 1") {
+    val src = new Img(3, 4)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8
+    src(0, 3) = 50; src(1, 3) = 11; src(2, 3) = 16
+
+    assert(boxBlurKernel(src, 2, 3, 1) === 10,
+      s"(boxBlurKernel(2, 3, 1) should be 10, " +
+        s"but it's ${boxBlurKernel(src, 2, 3, 1)})")
+  }
+
+  test("boxBlurKernel should return the correct value on an interior pixel with outside values of the image22" +
+    "of a 3x4 image with radius 1") {
+    val src = new Img(3, 4)
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8
+    src(0, 3) = 50; src(1, 3) = 11; src(2, 3) = 16
+
+    assert(boxBlurKernel(src, 1, 1, 2) === 9,
+      s"(boxBlurKernel(1, 1, 2) should be 9, " +
+        s"but it's ${boxBlurKernel(src, 1, 1, 2)})")
+  }
+
+  test("boxBlurKernel should return the correct value on an interior pixel 2,0" +
+    "of a 3x3 image with radius 1") {
+    val src = new Img(3, 3)
+    
+    src(0, 0) = 0; src(1, 0) = 1; src(2, 0) = 2
+    src(0, 1) = 3; src(1, 1) = 4; src(2, 1) = 5
+    src(0, 2) = 6; src(1, 2) = 7; src(2, 2) = 8
+
+    assert(boxBlurKernel(src, 2, 0, 1) === 3,
+      s"(boxBlurKernel(0, 2, 0) should be 3, " +
+        s"but it's ${boxBlurKernel(src, 2, 0, 1)})")
   }
 
   test("HorizontalBoxBlur.blur with radius 1 should correctly blur the entire 3x3 image") {

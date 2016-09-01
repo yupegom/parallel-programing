@@ -43,8 +43,12 @@ object HorizontalBoxBlur {
    */
   def blur(src: Img, dst: Img, from: Int, end: Int, radius: Int): Unit = {
   // TODO implement this method using the `boxBlurKernel` method
+    for {
+      y <- from until end
+      x <- 0 until src.width  
+    } yield dst.update(x, y, boxBlurKernel(src, x, y, radius))
 
-  ???
+
   }
 
   /** Blurs the rows of the source image in parallel using `numTasks` tasks.
@@ -56,7 +60,14 @@ object HorizontalBoxBlur {
   def parBlur(src: Img, dst: Img, numTasks: Int, radius: Int): Unit = {
   // TODO implement using the `task` construct and the `blur` method
 
-  ???
+    val splitingPoints = 0 until src.height by numTasks
+    val startEndTuples = splitingPoints zip splitingPoints.tail
+    val tasks = for{
+      (start, end) <- startEndTuples
+    } yield task {
+      blur(src, dst, start, end, radius)
+    }
+    tasks.map(_.join)  
   }
 
 }
